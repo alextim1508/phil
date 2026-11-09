@@ -1,0 +1,9 @@
+.idea/
+.junie/
+target/
+.gradle/
+build/
+ollama/
+*.iml
+*.iws
+out/

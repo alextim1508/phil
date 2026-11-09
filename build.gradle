@@ -1,0 +1,58 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '4.0.7'
+}
+
+group = 'com.alextim.phil'
+version = '0.1.0-SNAPSHOT'
+description = 'Учебный coding-агент на Spring AI'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    mockitoAgent
+}
+
+dependencies {
+    implementation platform('org.springframework.boot:spring-boot-dependencies:4.0.7')
+    implementation platform('org.springframework.ai:spring-ai-bom:2.0.0')
+    implementation 'org.springframework.ai:spring-ai-starter-model-ollama'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.assertj:assertj-core'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    mockitoAgent platform('org.springframework.boot:spring-boot-dependencies:4.0.7')
+    mockitoAgent('org.mockito:mockito-core') { transitive = false }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.compilerArgs.add('-Xlint:deprecation')
+}
+
+tasks.named('test') {
+    useJUnitPlatform {
+        if (project.hasProperty('includeTags')) {
+            includeTags(*project.property('includeTags').toString().split(','))
+        } else {
+            excludeTags 'ollama', 'mcp'
+        }
+    }
+    jvmArgs '-Xshare:off', '-Dstdout.encoding=UTF-8', '-Dstderr.encoding=UTF-8'
+    doFirst {
+        jvmArgs "-javaagent:${configurations.mockitoAgent.asPath}"
+    }
+}
+
+tasks.named('bootRun') {
+    jvmArgs '-Dstdout.encoding=UTF-8', '-Dstderr.encoding=UTF-8'
+}
