@@ -30,14 +30,16 @@ public class Agent {
             Never claim you have seen a file that you did not read with a tool.
             
             Answer concisely.""";
+
     private final ApplicationEventPublisher publisher;
 
-    private final Conversation conversation = new Conversation(SYSTEM_PROMPT);
     private final ToolRegistry toolRegistry;
+
     private final SpringAiToolAdapter springAiToolAdapter;
+
     private final AgentProperties agentProperties;
 
-
+    private final Conversation conversation = new Conversation(SYSTEM_PROMPT);
 
     public Conversation conversation() {
         return conversation;
@@ -63,20 +65,22 @@ public class Agent {
         Instant startTime = Instant.now();
         conversation.addUserMessage(userMessage);
         publisher.publishEvent(new AgentEvent.TurnStarted(userMessage));
+
         for (int iteration = 1; iteration <= agentProperties.maxTurns(); iteration++) {
             AssistantMessage assistantMessage = askModel();
             conversation.addAssistantMessage(assistantMessage);
             publisher.publishEvent(new AgentEvent.AgentSpoke(assistantMessage.getText()));
-            if(!assistantMessage.hasToolCalls()){
-                publisher.publishEvent(new AgentEvent.TurnFinished(Duration.between(startTime, Instant.now()),iteration));
+
+            if (!assistantMessage.hasToolCalls()) {
+                publisher.publishEvent(new AgentEvent.TurnFinished(Duration.between(startTime, Instant.now()), iteration));
                 return assistantMessage.getText();
             }
             conversation.addToolResponses(executeAll(assistantMessage));
         }
+
         publisher.publishEvent(new AgentEvent.TurnLimitReached(agentProperties.maxTurns()));
         publisher.publishEvent(new AgentEvent.TurnFinished(Duration.between(startTime, Instant.now()), agentProperties.maxTurns()));
         return "Достигнут предел в %d итераций — задача не завершена.".formatted(agentProperties.maxTurns());
-
     }
 
     private AssistantMessage askModel() {
@@ -90,9 +94,10 @@ public class Agent {
 
     private ToolResponseMessage executeAll(AssistantMessage assistantMessage) {
         List<ToolResponseMessage.ToolResponse> toolResponses = new ArrayList<>();
+
         for (AssistantMessage.ToolCall toolCall : assistantMessage.getToolCalls()) {
             ToolResult toolResult = toolRegistry.execute(toolCall.name(), toolCall.arguments());
-            toolResponses.add(new ToolResponseMessage.ToolResponse(toolCall.id(),toolCall.name(),toolResult.content()));
+            toolResponses.add(new ToolResponseMessage.ToolResponse(toolCall.id(), toolCall.name(), toolResult.content()));
         }
         return ToolResponseMessage.builder().responses(toolResponses).build();
     }

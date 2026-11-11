@@ -14,8 +14,13 @@ import java.util.Map;
 @Component
 public class ToolRegistry {
 
+    private static final int PREVIEW_LINES = 3;
+    private static final int PREVIEW_CHARS = 100;
+
     private final Map<String, Tool<?>> byName = new LinkedHashMap<>();
+
     private final ApplicationEventPublisher publisher;
+
     private final JsonHelper json = new JsonHelper();
 
     public ToolRegistry(List<Tool<?>> tools, ApplicationEventPublisher applicationEventPublisher) {
@@ -44,7 +49,8 @@ public class ToolRegistry {
         publisher.publishEvent(new AgentEvent.ToolCallStarted(toolName, describeCall(tool, arguments)));
         Instant toolStartedAt = Instant.now();
         ToolResult toolResult = invoke(tool, arguments);
-        publisher.publishEvent(new AgentEvent.ToolCallFinished(toolName,toolResult.error(),toolResult.preview(120), Duration.between(toolStartedAt, Instant.now())));
+        publisher.publishEvent(new AgentEvent.ToolCallFinished(toolName, toolResult.error(),
+                toolResult.preview(PREVIEW_LINES, PREVIEW_CHARS), Duration.between(toolStartedAt, Instant.now())));
         return toolResult;
     }
 
@@ -62,13 +68,12 @@ public class ToolRegistry {
         }
     }
 
-
     private <I> String describeCall(Tool<I> tool, String argumentsJson) {
         try {
             String described = tool.renderToolUseMessage(json.fromJson(argumentsJson, tool.inputType()));
-            return described == null ? "" : described;
+            return described == null || described.isBlank() ? tool.tag() : described;
         } catch (Exception e) {
-            return "";
+            return tool.tag();
         }
     }
 
