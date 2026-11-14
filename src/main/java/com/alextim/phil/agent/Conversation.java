@@ -6,9 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Conversation {
-
     private final String systemPrompt;
-
     private final List<Message> messages = new ArrayList<>();
 
     public Conversation(String systemPrompt) {

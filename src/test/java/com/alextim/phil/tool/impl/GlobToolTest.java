@@ -3,6 +3,8 @@ package com.alextim.phil.tool.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.alextim.phil.agent.AgentProperties;
+import com.alextim.phil.tool.FileStateCache;
+import com.alextim.phil.tool.ToolContext;
 import com.alextim.phil.tool.ToolResult;
 import com.alextim.phil.tool.WorkspaceGuard;
 import java.io.IOException;
@@ -17,15 +19,17 @@ class GlobToolTest {
     @TempDir
     Path workspace;
 
+    private final ToolContext context = new ToolContext(new FileStateCache());
+
     private GlobTool tool;
 
     @BeforeEach
     void setUp() {
-        tool = new GlobTool(new WorkspaceGuard(new AgentProperties(20, workspace.toString())));
+        tool = new GlobTool(new WorkspaceGuard(new AgentProperties(20, workspace.toString(), true)));
     }
 
     private ToolResult glob(String pattern, String path) {
-        return tool.call(new GlobTool.Input(pattern, path));
+        return tool.call(new GlobTool.Input(pattern, path), context);
     }
 
     private void create(String relativePath) throws IOException {

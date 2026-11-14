@@ -1,6 +1,7 @@
 package com.alextim.phil.tool.impl;
 
 import com.alextim.phil.tool.Tool;
+import com.alextim.phil.tool.ToolContext;
 import com.alextim.phil.tool.ToolResult;
 import com.alextim.phil.tool.WorkspaceGuard;
 import org.jspecify.annotations.Nullable;
@@ -72,7 +73,7 @@ public class FileReadTool implements Tool<FileReadTool.Input> {
     }
 
     @Override
-    public ToolResult call(Input input) {
+    public ToolResult call(Input input, ToolContext context) {
         Path pathToFile;
         try {
             pathToFile = workspaceGuard.resolve(input.filePath());
@@ -93,6 +94,7 @@ public class FileReadTool implements Tool<FileReadTool.Input> {
         } catch (IOException e) {
            return  ToolResult.error("не удалось прочитать %s: %s".formatted(input.filePath(), e.getMessage()));
         }
+        context.readFileState().remember(pathToFile);
 
         if(lines.isEmpty()) {
             return ToolResult.ok("файл пустой");

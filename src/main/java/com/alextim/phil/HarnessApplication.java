@@ -12,7 +12,7 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 @ConfigurationPropertiesScan
 public class HarnessApplication {
 
-    static void main(String[] args) {
+    public static void main(String[] args) {
         SpringApplication.run(HarnessApplication.class, args);
     }
 }

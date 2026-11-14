@@ -3,12 +3,10 @@ package com.alextim.phil.tool;
 import java.util.ArrayList;
 import java.util.List;
 
-public record ToolResult(String content, boolean error) {
-
+public record ToolResult (String content, boolean error){
     public static ToolResult ok(String content) {
         return new ToolResult(content, false);
     }
-
     public static ToolResult error(String content) {
         return new ToolResult(content, true);
     }

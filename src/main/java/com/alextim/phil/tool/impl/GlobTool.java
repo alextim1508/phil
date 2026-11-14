@@ -1,6 +1,7 @@
 package com.alextim.phil.tool.impl;
 
 import com.alextim.phil.tool.Tool;
+import com.alextim.phil.tool.ToolContext;
 import com.alextim.phil.tool.ToolResult;
 import com.alextim.phil.tool.WorkspaceGuard;
 import org.jspecify.annotations.Nullable;
@@ -11,7 +12,6 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
-import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.util.Comparator;
@@ -53,7 +53,7 @@ public class GlobTool implements Tool<GlobTool.Input> {
     }
 
     @Override
-    public ToolResult call(Input input) {
+    public ToolResult call(Input input, ToolContext toolContext) {
         if (input.pattern() == null || input.pattern().isBlank()) {
             return ToolResult.error("не указан шаблон поиска");
         }
@@ -74,7 +74,7 @@ public class GlobTool implements Tool<GlobTool.Input> {
         }
         List<Path> found;
         try (Stream<Path> walk = Files.walk(root)) {
-            found = walk.filter(path -> Files.isRegularFile(path, LinkOption.NOFOLLOW_LINKS))
+            found = walk.filter(Files::isRegularFile)
                     .filter(path -> !Ignored.contains(root, path))
                     .filter(path -> matcher.matches(root.relativize(path)))
                     .sorted(Comparator.comparing(GlobTool::modifiedAt).reversed())

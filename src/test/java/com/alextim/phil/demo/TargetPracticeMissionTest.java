@@ -1,0 +1,112 @@
+package com.alextim.phil.demo;
+
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+/**
+ * Приёмка живого прогона: проверяет не наш код, а тот, который написала модель.
+ *
+ * <p>Запускается руками, сразу после демонстрации, пока мишень ещё поправлена:
+ *
+ * <pre>$env:HARNESS_MISSION = 'true'; .\gradlew.bat test -PincludeTags=mission</pre>
+ *
+ * <p>Включается только при {@code HARNESS_MISSION=true}. Иначе он был бы
+ * красным всегда — в репозитории
+ * мишень лежит нереализованной, а класса {@code SourceLocation} нет вовсе.
+ *
+ * <p>Отсюда и отражение вместо прямых вызовов. Класс, который мы проверяем,
+ * пишет агент, и форму выбирает сам: {@code record}, класс с геттерами, поля
+ * наружу. Проверяем смысл, а не форму — и остаёмся собираемыми, когда мишень
+ * возвращена на место, а {@code SourceLocation} удалён.
+ */
+@Tag("mission")
+@EnabledIfEnvironmentVariable(named = "HARNESS_MISSION", matches = "true")
+class TargetPracticeMissionTest {
+
+    /** Пример из javadoc мишени — тот, который звучит в кадре. */
+    @Test
+    void packageOfReturnsPackageAndClassName() throws Exception {
+        assertLocation("src/main/java/com/alextim/phil/agent/Agent.java",
+                "com.alextim.phil.agent", "Agent");
+    }
+
+    /** Второй путь: ловим ответ, подогнанный под единственный пример из javadoc. */
+    @Test
+    void packageOfWorksForNestedPackage() throws Exception {
+        assertLocation("src/main/java/com/alextim/phil/tool/impl/GrepTool.java",
+                "com.alextim.phil.tool.impl", "GrepTool");
+    }
+
+    private static void assertLocation(String sourcePath, String packageName, String className)
+            throws Exception {
+        Class<?> sourceLocation = sourceLocationClass();
+        Method packageOf = theOnlyPackageOf();
+
+        assertThat(packageOf.getReturnType())
+                .as("packageOf должен возвращать SourceLocation")
+                .isEqualTo(sourceLocation);
+
+        Object location = packageOf.invoke(null, sourcePath);
+        assertThat(location).as("packageOf вернул null").isNotNull();
+        assertThat(valueOf(location, "packageName"))
+                .as("packageName для %s", sourcePath).isEqualTo(packageName);
+        assertThat(valueOf(location, "className"))
+                .as("className для %s", sourcePath).isEqualTo(className);
+    }
+
+    /** Класса может не быть: тогда агент до него просто не дошёл. */
+    private static Class<?> sourceLocationClass() {
+        try {
+            return Class.forName("com.alextim.phil.demo.SourceLocation");
+        } catch (ClassNotFoundException notWritten) {
+            throw new AssertionError("класса com.alextim.phil.demo.SourceLocation нет:"
+                    + " агент его не завёл", notWritten);
+        }
+    }
+
+    /**
+     * Метод должен быть ровно один. Два {@code packageOf} рядом — это не успех
+     * с замечанием, а невыполненное задание: просили поменять существующий.
+     */
+    private static Method theOnlyPackageOf() {
+        List<Method> found = Arrays.stream(TargetPractice.class.getDeclaredMethods())
+                .filter(method -> method.getName().equals("packageOf"))
+                .toList();
+        if (found.isEmpty()) {
+            throw new AssertionError("в TargetPractice нет метода packageOf");
+        }
+        if (found.size() > 1) {
+            throw new AssertionError("методов packageOf в TargetPractice: " + found.size()
+                    + " — агент завёл второй рядом вместо правки существующего");
+        }
+        return found.getFirst();
+    }
+
+    /** Значение поля, как бы агент его ни оформил: аксессор, геттер, поле. */
+    private static Object valueOf(Object instance, String name) throws Exception {
+        String getter = "get" + Character.toUpperCase(name.charAt(0)) + name.substring(1);
+        for (String candidate : List.of(name, getter)) {
+            try {
+                Method accessor = instance.getClass().getMethod(candidate);
+                return accessor.invoke(instance);
+            } catch (NoSuchMethodException keepLooking) {
+                // следующий вариант имени
+            }
+        }
+        try {
+            Field plain = instance.getClass().getDeclaredField(name);
+            plain.setAccessible(true);
+            return plain.get(instance);
+        } catch (NoSuchFieldException notThere) {
+            throw new AssertionError("у SourceLocation нет ни метода, ни поля " + name, notThere);
+        }
+    }
+}

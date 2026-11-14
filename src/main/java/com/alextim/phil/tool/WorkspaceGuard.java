@@ -9,7 +9,6 @@ import java.nio.file.Path;
 
 @Component
 public class WorkspaceGuard {
-
     private final Path root;
 
     public WorkspaceGuard(AgentProperties agentProperties) {

@@ -1,6 +1,7 @@
 package com.alextim.phil.tool.impl;
 
 import com.alextim.phil.tool.Tool;
+import com.alextim.phil.tool.ToolContext;
 import com.alextim.phil.tool.ToolResult;
 import com.alextim.phil.tool.WorkspaceGuard;
 import org.jspecify.annotations.Nullable;
@@ -10,7 +11,6 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.nio.charset.MalformedInputException;
 import java.nio.file.Files;
-import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.util.ArrayList;
@@ -44,8 +44,7 @@ public class GrepTool implements Tool<GrepTool.Input> {
     public String description() {
         return """
                 Searches inside files with a regular expression. Use this when you know
-                what the code says but not which file says it. To find a file by its name,
-                use Glob instead.
+                what the code says but not which file says it.
 
                 Usage:
                 - Output modes: FILES_WITH_MATCHES lists paths (default), CONTENT shows matching
@@ -62,7 +61,7 @@ public class GrepTool implements Tool<GrepTool.Input> {
     }
 
     @Override
-    public ToolResult call(Input input) {
+    public ToolResult call(Input input, ToolContext toolContext) {
         if (input.pattern() == null || input.pattern().isBlank()) {
             return ToolResult.error(
                     "не указан шаблон поиска: заполни поле pattern — например \"@Test\" или \"class .*Tool\"");
@@ -87,7 +86,7 @@ public class GrepTool implements Tool<GrepTool.Input> {
         PathMatcher glob = input.glob() == null ? null : GlobTool.matcherFor(input.glob());
         List<Path> files;
         try (Stream<Path> walk = Files.walk(root)) {
-            files = walk.filter(path -> Files.isRegularFile(path, LinkOption.NOFOLLOW_LINKS))
+            files = walk.filter(Files::isRegularFile)
                     .filter(path -> !Ignored.contains(root, path))
                     .filter(path -> glob == null || glob.matches(root.relativize(path)))
                     .toList();
@@ -110,14 +109,14 @@ public class GrepTool implements Tool<GrepTool.Input> {
         int shown = 0;
         for (Path file : files) {
             List<String> lines = lines(file);
-            for (int i = 0; i < lines.size(); i++) {
+            for (int i = 0; i < lines.size() && shown < MAX_MATCHES; i++) {
                 if (regex.matcher(lines.get(i)).find()) {
                     out.append("%s:%d:%s%n".formatted(workspaceGuard.relativize(file), i + 1, lines.get(i).strip()));
                     shown++;
                 }
-                if (shown >= MAX_MATCHES) {
+                if(shown>=MAX_MATCHES){
                     out.append("… показаны первые %d совпадений, уточни шаблон".formatted(MAX_MATCHES));
-                    return ToolResult.ok(out.toString());
+                    break;
                 }
             }
         }

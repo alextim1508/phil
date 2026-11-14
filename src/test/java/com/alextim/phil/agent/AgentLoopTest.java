@@ -4,6 +4,7 @@ import static com.alextim.phil.agent.TestAgents.agent;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.alextim.phil.tool.Tool;
+import com.alextim.phil.tool.ToolContext;
 import com.alextim.phil.tool.ToolResult;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +58,7 @@ class AgentLoopTest {
         }
 
         @Override
-        public ToolResult call(Input input) {
+        public ToolResult call(Input input, ToolContext context) {
             calls.add(input.value());
             return answer;
         }

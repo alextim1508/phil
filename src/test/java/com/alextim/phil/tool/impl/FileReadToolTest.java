@@ -3,6 +3,8 @@ package com.alextim.phil.tool.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.alextim.phil.agent.AgentProperties;
+import com.alextim.phil.tool.FileStateCache;
+import com.alextim.phil.tool.ToolContext;
 import com.alextim.phil.tool.ToolResult;
 import com.alextim.phil.tool.WorkspaceGuard;
 import java.io.IOException;
@@ -18,15 +20,17 @@ class FileReadToolTest {
     @TempDir
     Path workspace;
 
+    private final ToolContext context = new ToolContext(new FileStateCache());
+
     private FileReadTool tool;
 
     @BeforeEach
     void setUp() {
-        tool = new FileReadTool(new WorkspaceGuard(new AgentProperties(20, workspace.toString())));
+        tool = new FileReadTool(new WorkspaceGuard(new AgentProperties(20, workspace.toString(), true)));
     }
 
     private ToolResult read(String path, Integer offset, Integer limit) {
-        return tool.call(new FileReadTool.Input(path, offset, limit));
+        return tool.call(new FileReadTool.Input(path, offset, limit), context);
     }
 
     private void write(String name, int lines) throws IOException {
