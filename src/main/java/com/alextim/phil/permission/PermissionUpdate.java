@@ -8,7 +8,7 @@ package com.alextim.phil.permission;
  * Режим здесь отсутствует: его задаёт человек в настройках, и в работе он не меняется.
  */
 public sealed interface PermissionUpdate {
-    /** SESSION — память до конца сессии; LOCAL — правило в .harness/permissions.local.yaml. */
+    /** SESSION — память до конца сессии; LOCAL — правило в .phil/permissions.local.yaml. */
     PermissionSource destination();
 
     /** Добавляем правило: например Bash(echo ok) + ALLOW. */

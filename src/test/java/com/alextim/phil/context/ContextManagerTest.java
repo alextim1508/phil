@@ -23,7 +23,7 @@ class ContextManagerTest {
 
     @TempDir Path folder;
 
-    /** Пустая папка: не репозиторий, {@code HARNESS.md} нет. */
+    /** Пустая папка: не репозиторий, {@code PHIL.md} нет. */
     private ContextManager manager() {
         AgentProperties properties = new AgentProperties(20, folder.toString(), true);
         ToolRegistry registry =
@@ -66,7 +66,7 @@ class ContextManagerTest {
 
         String prompt = manager().systemPrompt();
 
-        assertThat(prompt).contains("# Project notes (HARNESS.md)", "Maven в PATH нет");
+        assertThat(prompt).contains("# Project notes (PHIL.md)", "Maven в PATH нет");
     }
 
     /**

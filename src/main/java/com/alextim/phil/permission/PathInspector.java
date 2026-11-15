@@ -26,7 +26,7 @@ public final class PathInspector {
     }
 
     // Эти каталоги содержат настройки: обычного ALLOW и режима на запись в них недостаточно.
-    private static final Set<String> PROTECTED_DIRECTORIES = Set.of(".git", ".idea", ".vscode", ".claude", ".harness", ".mvn", ".husky", ".cargo", ".devcontainer", ".yarn");
+    private static final Set<String> PROTECTED_DIRECTORIES = Set.of(".git", ".idea", ".vscode", ".claude", ".phil", ".mvn", ".husky", ".cargo", ".devcontainer", ".yarn");
     // Эти файлы тоже считаем настройками, даже если они лежат вне служебного каталога.
     private static final Set<String> PROTECTED_FILES = Set.of(
             ".gitconfig", ".gitmodules", ".bashrc", ".bash_profile", ".bash_login", ".bash_aliases", ".bash_logout", ".zshrc", ".zprofile", ".zshenv", ".zlogin", ".zlogout",

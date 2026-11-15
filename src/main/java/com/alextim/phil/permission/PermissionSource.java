@@ -12,13 +12,13 @@ public enum PermissionSource {
     /** application.yaml: правила, которые Spring связал с PermissionProperties. */
     APPLICATION,
 
-    /** ~/.harness/permissions.yaml — настройки человека для всех его проектов. */
+    /** ~/.phil/permissions.yaml — настройки человека для всех его проектов. */
     USER,
 
-    /** .harness/permissions.yaml — настройки этого проекта. */
+    /** .phil/permissions.yaml — настройки этого проекта. */
     PROJECT,
 
-    /** .harness/permissions.local.yaml — сюда уходит постоянное согласие. */
+    /** .phil/permissions.local.yaml — сюда уходит постоянное согласие. */
     LOCAL,
 
     /** Согласие этой сессии: живёт в памяти и исчезает с перезапуском. */

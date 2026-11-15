@@ -23,9 +23,9 @@ public class OrdersCollector {
     public OrdersCollector(PermissionProperties properties, WorkspaceGuard guard) {
         // В рабочем приложении используем стандартные пути; тесты могут передать свои через второй конструктор.
         this(properties, guard, Map.of(
-                PermissionSource.USER, Path.of(System.getProperty("user.home"), ".harness", "permissions.yaml"),
-                PermissionSource.PROJECT, guard.root().resolve(".harness/permissions.yaml"),
-                PermissionSource.LOCAL, guard.root().resolve(".harness/permissions.local.yaml")));
+                PermissionSource.USER, Path.of(System.getProperty("user.home"), ".phil", "permissions.yaml"),
+                PermissionSource.PROJECT, guard.root().resolve(".phil/permissions.yaml"),
+                PermissionSource.LOCAL, guard.root().resolve(".phil/permissions.local.yaml")));
     }
 
     public OrdersCollector(PermissionProperties properties, WorkspaceGuard guard, Map<PermissionSource, Path> files) {

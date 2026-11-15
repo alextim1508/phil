@@ -44,8 +44,8 @@ class ContextSourcesTest {
     }
 
     @Test
-    void читаетHarnessMd() throws IOException {
-        Files.writeString(folder.resolve(ProjectMemoryLoader.MEMORY_FILE), "# Правила\nСобирать через mvnw.\n");
+    void читаетPhilMd() throws IOException {
+        Files.writeString(folder.resolve("PHIL.md"), "# Правила\nСобирать через mvnw.\n");
 
         assertThat(new ProjectMemoryLoader(в(folder)).load()).contains("Собирать через mvnw");
     }

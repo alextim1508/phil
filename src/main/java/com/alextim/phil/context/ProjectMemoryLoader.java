@@ -12,7 +12,7 @@ import java.nio.file.Path;
 @Component
 public class ProjectMemoryLoader {
 
-    static final String MEMORY_FILE = "HARNESS.md";
+    static final String MEMORY_FILE = "PHIL.md";
 
     static final int MAX_CHARS = 8000;
 
