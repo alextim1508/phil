@@ -2,7 +2,6 @@ package com.alextim.phil.demo;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -16,10 +15,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * <p>Запускается руками, сразу после демонстрации, пока мишень ещё поправлена:
  *
- * <pre>$env:HARNESS_MISSION = 'true'; .\gradlew.bat test -PincludeTags=mission</pre>
+ * <pre>mvnw test -Dgroups=mission -Dexcluded.groups=</pre>
  *
- * <p>Включается только при {@code HARNESS_MISSION=true}. Иначе он был бы
- * красным всегда — в репозитории
+ * <p>С остальными тестами не едет: метка {@code mission} стоит в списке
+ * исключённых в {@code pom.xml}. Иначе он был бы красным всегда — в репозитории
  * мишень лежит нереализованной, а класса {@code SourceLocation} нет вовсе.
  *
  * <p>Отсюда и отражение вместо прямых вызовов. Класс, который мы проверяем,
@@ -28,7 +27,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  * возвращена на место, а {@code SourceLocation} удалён.
  */
 @Tag("mission")
-@EnabledIfEnvironmentVariable(named = "HARNESS_MISSION", matches = "true")
 class TargetPracticeMissionTest {
 
     /** Пример из javadoc мишени — тот, который звучит в кадре. */

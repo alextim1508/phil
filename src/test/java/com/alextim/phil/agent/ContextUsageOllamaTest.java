@@ -1,5 +1,7 @@
 package com.alextim.phil.agent;
 
+import org.springframework.context.annotation.Import;
+import com.alextim.phil.TestPermissionConfig;
 import com.alextim.phil.agent.event.AgentEvent;
 import com.alextim.phil.tool.Tool;
 import org.junit.jupiter.api.RepeatedTest;
@@ -21,6 +23,7 @@ import static org.assertj.core.api.Assertions.fail;
  */
 @Tag("ollama")
 @SpringBootTest
+@Import(TestPermissionConfig.class)
 @ActiveProfiles("test")
 class ContextUsageOllamaTest {
 

@@ -1,5 +1,7 @@
 package com.alextim.phil.tool.impl;
 
+import com.alextim.phil.permission.PathInspector;
+import com.alextim.phil.permission.PermissionDecision;
 import com.alextim.phil.tool.Tool;
 import com.alextim.phil.tool.ToolContext;
 import com.alextim.phil.tool.ToolResult;
@@ -29,7 +31,7 @@ public class FileWriteTool implements Tool<FileWriteTool.Input> {
     public String description() {
         return """
                 Writes a file to the local filesystem, overwriting it if it exists.
-
+                
                 Usage:
                 - Use this tool to create a new file or to rewrite one completely
                 - If the file exists, you MUST use Read on it first. This tool fails
@@ -50,6 +52,11 @@ public class FileWriteTool implements Tool<FileWriteTool.Input> {
     @Override
     public String renderToolUseMessage(Input input) {
         return input.filePath() == null ? tag() : tag() + " " + input.filePath();
+    }
+
+    @Override
+    public PermissionDecision checkPermissions(Input input, ToolContext context) {
+       return PathInspector.checkWrite(workspaceGuard,input.filePath(),context.permissions());
     }
 
     @Override

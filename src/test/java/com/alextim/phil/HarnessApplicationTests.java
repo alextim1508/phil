@@ -1,5 +1,6 @@
 package com.alextim.phil;
 
+import org.springframework.context.annotation.Import;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -9,6 +10,7 @@ import org.springframework.test.context.ActiveProfiles;
  * Ловит опечатки в конфиге, циклы в зависимостях и неоднозначные бины ещё до запуска.
  */
 @SpringBootTest
+@Import(TestPermissionConfig.class)
 @ActiveProfiles("test")
 class HarnessApplicationTests {
 

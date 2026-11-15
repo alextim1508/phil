@@ -1,5 +1,7 @@
 package com.alextim.phil.tool.impl;
 
+import com.alextim.phil.permission.PathInspector;
+import com.alextim.phil.permission.PermissionDecision;
 import com.alextim.phil.tool.Tool;
 import com.alextim.phil.tool.ToolContext;
 import com.alextim.phil.tool.ToolResult;
@@ -58,6 +60,23 @@ public class GrepTool implements Tool<GrepTool.Input> {
     @Override
     public Class<Input> inputType() {
         return Input.class;
+    }
+
+
+    /**
+     * Поиск читает каталог: PermissionEvaluator вызывает Tool, Tool выбирает файловую проверку чтения.
+     * В ОРИГИНАЛЕ поиск ещё и прячет запрещённые файлы: шаблоны из запретов Read передаются
+     * поиску как список исключений, и модель не видит ни имён, ни строк из таких файлов.
+     * У нас проверяется только каталог, в котором ищем.
+     */
+    @Override
+    public PermissionDecision checkPermissions(Input input, ToolContext context) {
+        return PathInspector.checkRead(workspaceGuard, searchPath(input), context.permissions());
+    }
+
+    /** Если path не задан, ищем от корня проекта. */
+    private static String searchPath(Input input) {
+        return input.path() == null ? "." : input.path();
     }
 
     @Override

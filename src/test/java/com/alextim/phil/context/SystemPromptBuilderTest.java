@@ -1,21 +1,22 @@
 package com.alextim.phil.context;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.alextim.phil.TestPermissionConfig;
 import com.alextim.phil.tool.FileStateCache;
 import com.alextim.phil.tool.Tool;
 import com.alextim.phil.tool.ToolContext;
 import com.alextim.phil.tool.ToolRegistry;
 import com.alextim.phil.tool.ToolResult;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationEventPublisher;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 class SystemPromptBuilderTest {
 
-    private static final ApplicationEventPublisher БЕЗ_СОБЫТИЙ = event -> {
-    };
+    private static final ApplicationEventPublisher БЕЗ_СОБЫТИЙ = event -> {};
 
     /** Инструмент-пустышка: промпту нужны только имя и первая строка описания. */
     static class FakeTool implements Tool<String> {
@@ -42,8 +43,14 @@ class SystemPromptBuilderTest {
 
     private SystemPromptBuilder builder(boolean personality) {
         ToolRegistry registry =
-                new ToolRegistry(List.of(new FakeTool()), БЕЗ_СОБЫТИЙ, new FileStateCache());
-        return new SystemPromptBuilder(registry, new com.alextim.phil.agent.AgentProperties(20, ".", personality));
+                com.alextim.phil.TestPermissionConfig.registry(
+                        List.of(new FakeTool()),
+                        БЕЗ_СОБЫТИЙ,
+                        new FileStateCache(),
+                        TestPermissionConfig.permissive(),
+                        TestPermissionConfig.allowOnce());
+        return new SystemPromptBuilder(
+                registry, new com.alextim.phil.agent.AgentProperties(20, ".", personality));
     }
 
     @Test
@@ -64,8 +71,8 @@ class SystemPromptBuilderTest {
     }
 
     /**
-     * Инвентарь, а не перечисление через запятую: с числом и по строке на инструмент.
-     * Плоский список модель читала невнимательно и теряла из него элементы.
+     * Инвентарь, а не перечисление через запятую: с числом и по строке на инструмент. Плоский
+     * список модель читала невнимательно и теряла из него элементы.
      */
     @Test
     void перечисляетИнструментыСЯвнымЧислом() {

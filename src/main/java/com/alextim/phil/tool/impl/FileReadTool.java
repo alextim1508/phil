@@ -1,5 +1,7 @@
 package com.alextim.phil.tool.impl;
 
+import com.alextim.phil.permission.PathInspector;
+import com.alextim.phil.permission.PermissionDecision;
 import com.alextim.phil.tool.Tool;
 import com.alextim.phil.tool.ToolContext;
 import com.alextim.phil.tool.ToolResult;
@@ -74,6 +76,9 @@ public class FileReadTool implements Tool<FileReadTool.Input> {
 
     @Override
     public ToolResult call(Input input, ToolContext context) {
+        if (input.filePath() == null || input.filePath().isBlank()) {
+            return ToolResult.error("не указан файл: заполни поле filePath");
+        }
         Path pathToFile;
         try {
             pathToFile = workspaceGuard.resolve(input.filePath());
@@ -107,6 +112,11 @@ public class FileReadTool implements Tool<FileReadTool.Input> {
                     "в файле всего %d строк, запрошено начиная с %d".formatted(lines.size(), from));
         }
         return ToolResult.ok(render(lines,from,to));
+    }
+
+    @Override
+    public PermissionDecision checkPermissions(Input input, ToolContext context) {
+       return PathInspector.checkRead(workspaceGuard,input.filePath(),context.permissions());
     }
 
     public record Input(

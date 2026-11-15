@@ -1,5 +1,7 @@
 package com.alextim.phil.tool.impl;
 
+import com.alextim.phil.permission.PathInspector;
+import com.alextim.phil.permission.PermissionDecision;
 import com.alextim.phil.tool.Tool;
 import com.alextim.phil.tool.ToolContext;
 import com.alextim.phil.tool.ToolResult;
@@ -56,7 +58,10 @@ public class FileEditTool implements Tool<FileEditTool.Input> {
         return input.filePath() == null ? tag() : tag() + " " + input.filePath();
     }
 
-
+    @Override
+    public PermissionDecision checkPermissions(Input input, ToolContext context) {
+        return PathInspector.checkWrite(workspaceGuard,input.filePath(),context.permissions());
+    }
 
     @Override
     public ToolResult call(Input input, ToolContext context) {
