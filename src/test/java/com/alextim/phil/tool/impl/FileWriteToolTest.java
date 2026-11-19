@@ -46,9 +46,9 @@ class FileWriteToolTest {
 
     @Test
     void создаётПапкиПоПути() {
-        write("src/main/java/com/alextim/phil/Agent.java", "class Agent {}\n");
+        write("src/main/java/com/harness/Agent.java", "class Agent {}\n");
 
-        assertThat(workspace.resolve("src/main/java/com/alextim/phil/Agent.java")).exists();
+        assertThat(workspace.resolve("src/main/java/com/harness/Agent.java")).exists();
     }
 
     /**

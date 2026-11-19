@@ -44,7 +44,7 @@ tasks.named('test') {
         if (project.hasProperty('includeTags')) {
             includeTags(*project.property('includeTags').toString().split(','))
         } else {
-            excludeTags 'ollama', 'mcp'
+            excludeTags 'ollama', 'mcp', 'mission'
         }
     }
     jvmArgs '-Xshare:off', '-Dstdout.encoding=UTF-8', '-Dstderr.encoding=UTF-8'

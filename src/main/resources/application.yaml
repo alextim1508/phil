@@ -1,6 +1,6 @@
 spring:
   application:
-    name: harness
+    name: phil
   main:
     # Агент живёт в терминале, а не в вебе: без этого Boot поднял бы сервлет-контейнер,
     # если веб-стартер притянется транзитивно.
@@ -8,7 +8,7 @@ spring:
     banner-mode: off
   ai:
     ollama:
-      base-url: http://localhost:11431
+      base-url: http://localhost:11434
       chat:
         think: false
         temperature: 0.2
@@ -28,4 +28,4 @@ logging:
     console: "%msg%n"
 harness:
   permission:
-    mode: accept_edits
+    mode: default

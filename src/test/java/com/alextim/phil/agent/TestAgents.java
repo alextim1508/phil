@@ -7,6 +7,7 @@ import com.alextim.phil.context.ProjectMemoryLoader;
 import com.alextim.phil.context.SystemPromptBuilder;
 import com.alextim.phil.tool.FileStateCache;
 import com.alextim.phil.tool.SpringAiToolAdapter;
+import com.alextim.phil.tool.TodoStore;
 import com.alextim.phil.tool.Tool;
 import com.alextim.phil.tool.ToolRegistry;
 
@@ -28,11 +29,13 @@ final class TestAgents {
             RecordingEventPublisher events,
             AgentProperties properties,
             Tool<?>... tools) {
+        TodoStore todos = new TodoStore(16_384);
         ToolRegistry registry =
                 com.alextim.phil.TestPermissionConfig.registry(
                         List.of(tools),
                         events,
                         new FileStateCache(),
+                        todos,
                         TestPermissionConfig.permissive(),
                         TestPermissionConfig.allowOnce());
         return new Agent(
@@ -41,7 +44,8 @@ final class TestAgents {
                 registry,
                 new SpringAiToolAdapter(registry),
                 properties,
-                context(registry, properties));
+                context(registry, properties),
+                todos);
     }
 
     /**
