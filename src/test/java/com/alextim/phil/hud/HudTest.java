@@ -42,11 +42,19 @@ class HudTest {
                         agent,
                         List.of(),
                         com.alextim.phil.TestPermissionConfig.evaluator(
-                                com.alextim.phil.TestPermissionConfig.permissive()));
+                                com.alextim.phil.TestPermissionConfig.permissive()),
+                        16384);
     }
 
     private String output() {
         return buffer.toString(StandardCharsets.UTF_8);
+    }
+
+    @Test
+    void showsRemainingContextSpace() {
+        hud.onContextChanged(new AgentEvent.ContextChanged("ответ модели"));
+
+        assertThat(output()).contains("БЛОК ПАМЯТИ", "свободно 16 381", "из 16 384", "ответ модели");
     }
 
     @Test
@@ -123,7 +131,8 @@ class HudTest {
                                 new PrintStream(buffer, true, StandardCharsets.UTF_8)),
                         agent,
                         List.of(new com.alextim.phil.tool.impl.BashTool(new com.alextim.phil.tool.WorkspaceGuard(properties))),
-                        permissions);
+                        permissions,
+                        16384);
         List<BootLine> lines =
                 org.springframework.test.util.ReflectionTestUtils.invokeMethod(
                         monitor, "collectBootLines", 160);
@@ -144,7 +153,8 @@ class HudTest {
                         agent,
                         List.of(new com.alextim.phil.tool.impl.BashTool(new com.alextim.phil.tool.WorkspaceGuard(properties))),
                         com.alextim.phil.TestPermissionConfig.evaluator(
-                                com.alextim.phil.TestPermissionConfig.permissive()));
+                                com.alextim.phil.TestPermissionConfig.permissive()),
+                        16384);
         List<BootLine> lines =
                 org.springframework.test.util.ReflectionTestUtils.invokeMethod(
                         monitor, "collectBootLines", 160);

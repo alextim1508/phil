@@ -1,6 +1,7 @@
 package com.alextim.phil.agent;
 
 import com.alextim.phil.TestPermissionConfig;
+import com.alextim.phil.context.Compactor;
 import com.alextim.phil.context.ContextManager;
 import com.alextim.phil.context.GitStatusProvider;
 import com.alextim.phil.context.ProjectMemoryLoader;
@@ -45,7 +46,8 @@ final class TestAgents {
                 new SpringAiToolAdapter(registry),
                 properties,
                 context(registry, properties),
-                todos);
+                todos,
+                new Compactor(model, events, 16_384));
     }
 
     /**

@@ -87,7 +87,8 @@ class BashMissionOllamaTest {
                         new SpringAiToolAdapter(registry),
                         properties,
                         context,
-                        new com.alextim.phil.tool.TodoStore(16_384));
+                        new com.alextim.phil.tool.TodoStore(16_384),
+                        new com.alextim.phil.context.Compactor(chatModel, events, 16_384));
 
         String answer = agent.run("Запусти тесты проекта и скажи, всё ли зелено.");
 
